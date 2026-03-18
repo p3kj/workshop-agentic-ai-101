@@ -39,6 +39,9 @@ if (-not $isAdmin) {
     exit
 }
 
+# ── Execution policy — allow local scripts (npm, etc. need this) ──────────
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction SilentlyContinue
+
 # ── Colour helpers ──────────────────────────────────────────────────────────
 function Write-Step   { param([string]$msg) Write-Host "`n▶ $msg"   -ForegroundColor Cyan    }
 function Write-Ok     { param([string]$msg) Write-Host "  ✓ $msg"   -ForegroundColor Green   }
