@@ -18,8 +18,17 @@ $isAdmin = ([Security.Principal.WindowsPrincipal] `
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if (-not $isAdmin) {
-    # Re-launch this same script as Administrator; -Verb RunAs triggers the UAC prompt
-    $argList = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    # When run via  irm … | iex  there is no file on disk, so $PSCommandPath is empty.
+    # In that case, download the script to a temp file and re-launch from there.
+    if ($PSCommandPath) {
+        $scriptPath = $PSCommandPath
+    }
+    else {
+        $scriptPath = Join-Path $env:TEMP "setup-agentic-coding.ps1"
+        Invoke-RestMethod "https://raw.githubusercontent.com/p3kj/workshop-agentic-ai/refs/heads/main/setup-agentic-coding.ps1" -OutFile $scriptPath
+    }
+
+    $argList = "-ExecutionPolicy Bypass -File `"$scriptPath`""
     try {
         Start-Process powershell -Verb RunAs -ArgumentList $argList
     }
